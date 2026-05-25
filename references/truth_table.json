@@ -1,0 +1,291 @@
+{
+  "_doc": {
+    "purpose": "Zrodlo prawdy dla pipeline bronze->silver. Pipeline czyta reguly stad, nie trzyma ich w kodzie.",
+    "channel_fields": {
+      "reconstruction": "bipolar = roznica src1-src2 | substitution = uzyj pierwszej dostepnej alternatywy | direct = kanal wprost",
+      "sources": "skladowe (bipolar) lub alternatywy (substitution), nazwy bez sufiksu",
+      "critical": "true => brak nieodtwarzalny dyskwalifikuje pacjenta z silver",
+      "conflict": "sposob wyboru przy wielu kanalach zrodlowych rozdzielonych ';'",
+      "target_freq_hz": "docelowa czestotliwosc probkowania",
+      "resample": "down_only | up_only | both (dozwolony kierunek przepróbkowania)",
+      "unit": "none = bez zmian | zscore = normalizacja | fix_header = korekta naglowka bez normalizacji"
+    }
+  },
+  "dataset": {
+    "patients_total": 622,
+    "patients_silver": 580,
+    "excluded": 42,
+    "metadata_filename": "metadata.csv"
+  },
+  "annotation_channels": {
+    "human": [
+      "freq_arousal_expert",
+      "freq_limb_expert",
+      "freq_resp_expert",
+      "freq_stage_expert"
+    ],
+    "algorithmic": [
+      "freq_arousal_caisr",
+      "freq_limb_caisr",
+      "freq_resp_caisr",
+      "freq_stage_caisr",
+      "freq_caisr_prob_w",
+      "freq_caisr_prob_r",
+      "freq_caisr_prob_n1",
+      "freq_caisr_prob_n2",
+      "freq_caisr_prob_n3",
+      "freq_caisr_prob_arous",
+      "freq_caisr_prob_no-ar"
+    ]
+  },
+  "physiological_channels": {
+    "eeg_f3_m2": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eeg_f3",
+        "eeg_m2"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eeg_f4_m1": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eeg_f4",
+        "eeg_m1"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eeg_c3_m2": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eeg_c3",
+        "eeg_m2"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eeg_c4_m1": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eeg_c4",
+        "eeg_m1"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eeg_o1_m2": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eeg_o1",
+        "eeg_m2"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eeg_o2_m1": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eeg_o2",
+        "eeg_m1"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eog_e1_m2": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eog_e1",
+        "eeg_m2"
+      ],
+      "critical": false,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "eog_e2_m1": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "eog_e2",
+        "eeg_m1"
+      ],
+      "critical": false,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "chin_emg_chin1_chin2": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "chin_emg_chin_1",
+        "chin_emg_chin_2"
+      ],
+      "critical": false,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "leg_emg_lat": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "leg_emg_lleg_PLUS",
+        "leg_emg_lleg_MINUS"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "leg_emg_rat": {
+      "reconstruction": "bipolar",
+      "sources": [
+        "leg_emg_rleg_PLUS",
+        "leg_emg_rleg_MINUS"
+      ],
+      "critical": true,
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "ecg_ecg": {
+      "reconstruction": "direct",
+      "critical": true,
+      "conflict": {
+        "method": "sqi_hos",
+        "drop_if_all_flat": true
+      },
+      "target_freq_hz": 200,
+      "resample": "down_only",
+      "unit": "none"
+    },
+    "resp_chest": {
+      "reconstruction": "direct",
+      "critical": false,
+      "target_freq_hz": 100,
+      "resample": "both",
+      "unit": "zscore"
+    },
+    "resp_abd": {
+      "reconstruction": "direct",
+      "critical": false,
+      "target_freq_hz": 100,
+      "resample": "both",
+      "unit": "zscore"
+    },
+    "resp_ptaf": {
+      "reconstruction": "substitution",
+      "sources": [
+        "resp_airflow",
+        "resp_cflow"
+      ],
+      "critical": true,
+      "conflict": {
+        "method": "variance_priority",
+        "priority": [
+          "PTAF",
+          "Pressure"
+        ],
+        "nan_ratio_max": 0.5,
+        "variance_min": 0.01,
+        "drop_if_all_flat": true
+      },
+      "target_freq_hz": 100,
+      "resample": "both",
+      "unit": "zscore",
+      "header_fix": {
+        "freq_overrides": {
+          "20.0;200.0": 20.0
+        }
+      }
+    },
+    "resp_spo2": {
+      "reconstruction": "direct",
+      "critical": false,
+      "target_freq_hz": 25,
+      "resample": "both",
+      "unit": "fix_header",
+      "header_fix": {
+        "unit_overrides": {
+          "uV": "%"
+        },
+        "clip_range": [
+          0,
+          100
+        ]
+      }
+    }
+  },
+  "excluded_from_silver": {
+    "reconstruction_sources": [
+      "eeg_f3",
+      "eeg_f4",
+      "eeg_c3",
+      "eeg_c4",
+      "eeg_o1",
+      "eeg_o2",
+      "eeg_m1",
+      "eeg_m2",
+      "eog_e1",
+      "eog_e2",
+      "leg_emg_lleg_PLUS",
+      "leg_emg_lleg_MINUS",
+      "leg_emg_rleg_PLUS",
+      "leg_emg_rleg_MINUS",
+      "chin_emg_chin_1",
+      "chin_emg_chin_2"
+    ],
+    "ptaf_alternatives": [
+      "resp_airflow",
+      "resp_cflow"
+    ],
+    "skipped": [
+      "resp_cpres"
+    ]
+  },
+  "silver_channels": [
+    "eeg_f3_m2",
+    "eeg_f4_m1",
+    "eeg_c3_m2",
+    "eeg_c4_m1",
+    "eeg_o1_m2",
+    "eeg_o2_m1",
+    "eog_e1_m2",
+    "eog_e2_m1",
+    "chin_emg_chin1_chin2",
+    "leg_emg_lat",
+    "leg_emg_rat",
+    "ecg_ecg",
+    "resp_chest",
+    "resp_abd",
+    "resp_ptaf",
+    "resp_spo2",
+    "freq_arousal_expert",
+    "freq_limb_expert",
+    "freq_resp_expert",
+    "freq_stage_expert",
+    "freq_arousal_caisr",
+    "freq_limb_caisr",
+    "freq_resp_caisr",
+    "freq_stage_caisr",
+    "freq_caisr_prob_w",
+    "freq_caisr_prob_r",
+    "freq_caisr_prob_n1",
+    "freq_caisr_prob_n2",
+    "freq_caisr_prob_n3",
+    "freq_caisr_prob_arous",
+    "freq_caisr_prob_no-ar"
+  ]
+}

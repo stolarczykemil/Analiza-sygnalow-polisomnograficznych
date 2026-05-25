@@ -1,13 +1,21 @@
 from pathlib import Path
-from src.preliminary_pipeline import preliminary_pipeline
+from preliminary_pipeline import preliminary_pipeline
+from bronze_to_silver import process_bronze_to_silver
 
-DATA_PATH = Path("/home/emil/.cache/kagglehub/datasets/physionet/physionetchallenge2026data/versions/2/training_set")
-OUTPUT_PATH = Path("/home/emil/studia/inzynierka/data/silver/metadata.csv")
-MAPPING_PATH =  Path("/references/channel_table.csv")
+REPO = Path("/home/emil/studia/inzynierka")
+BRONZE_PATH = Path("/home/emil/.cache/kagglehub/datasets/physionet/physionetchallenge2026data/versions/2/training_set")
+SIGNALS_ROOT = BRONZE_PATH / "physiological_data"
+METADATA_PATH = REPO / "data/bronze/metadata.csv"
+MAPPING_PATH = REPO / "references/channel_table.csv"
+SILVER_PATH = REPO / "data/silver"
+TRUTH_TABLE_PATH = REPO / "references/truth_table.json"
 
-def run(data_path, mapping_path):
-    df = preliminary_pipeline(data_path, mapping_path)
-    df.to_csv(OUTPUT_PATH, index=False)
+
+def run():
+    df = preliminary_pipeline(BRONZE_PATH, MAPPING_PATH)
+    df.to_csv(METADATA_PATH, index=False)
+    summary = process_bronze_to_silver(METADATA_PATH, SIGNALS_ROOT, SILVER_PATH, TRUTH_TABLE_PATH)
+    return summary
 
 if __name__ == '__main__':
-    run(DATA_PATH, MAPPING_PATH)
+    print(run())
