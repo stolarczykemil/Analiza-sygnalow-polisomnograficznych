@@ -1,0 +1,65 @@
+{
+  "channel_class_thresholds": {
+    "eeg": {
+      "amplitude_max_uv": 500.0,
+      "amp_oor_ratio_max": 0.01,
+      "flat_var_min": 1.0,
+      "flat_run_min_samples": 200,
+      "frac_beyond_kmad_max": 0.1
+    },
+    "eog": {
+      "amplitude_max_uv": 2000.0,
+      "amp_oor_ratio_max": 0.01,
+      "flat_var_min": 1.0,
+      "flat_run_min_samples": 200,
+      "frac_beyond_kmad_max": 0.1
+    },
+    "chin_emg": {
+      "amplitude_max_uv": 500.0,
+      "amp_oor_ratio_max": 0.01,
+      "flat_var_min": 0.1,
+      "flat_run_min_samples": 200,
+      "frac_beyond_kmad_max": 0.1
+    },
+    "leg_emg": {
+      "amplitude_max_uv": 500.0,
+      "amp_oor_ratio_max": 0.04,
+      "flat_var_min": 0.1,
+      "flat_run_min_samples": 500,
+      "frac_beyond_kmad_max": 0.15
+    },
+    "ecg": {
+      "amplitude_max_uv": 5000.0,
+      "amp_oor_ratio_max": 0.01,
+      "flat_var_min": 10.0,
+      "flat_run_min_samples": 200,
+      "frac_beyond_kmad_max": 0.2
+    },
+    "resp_z": {
+      "flat_var_min": 0.0001,
+      "flat_run_min_samples": 300
+    },
+    "spo2": {
+      "physio_min": 70.0,
+      "desat_slope_max_pct_per_s": 2.25
+    }
+  },
+  "channel_to_class": {
+    "eeg_f3_m2": "eeg",
+    "eeg_f4_m1": "eeg",
+    "eeg_c3_m2": "eeg",
+    "eeg_c4_m1": "eeg",
+    "eeg_o1_m2": "eeg",
+    "eeg_o2_m1": "eeg",
+    "eog_e1_m2": "eog",
+    "eog_e2_m1": "eog",
+    "chin_emg_chin1_chin2": "chin_emg",
+    "leg_emg_lat": "leg_emg",
+    "leg_emg_rat": "leg_emg",
+    "ecg_ecg": "ecg",
+    "resp_chest": "resp_z",
+    "resp_abd": "resp_z",
+    "resp_ptaf": "resp_z",
+    "resp_spo2": "spo2"
+  }
+}
