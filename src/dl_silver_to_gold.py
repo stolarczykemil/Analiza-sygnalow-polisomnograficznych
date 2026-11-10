@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 import pyedflib
 
+from dl.config import CHANNEL_INDEX, EMG_CHANNELS
+from dl.quality import load_channel_thresholds, quality_mask
+
 SILVER_DIR = Path("/home/emil/studia/inzynierka/data/silver")
 GOLD_DL_DIR = Path("/home/emil/studia/inzynierka/data/gold_dl")
 CONFIG_DIR = Path("/home/emil/studia/inzynierka/references")
@@ -277,12 +280,20 @@ def channel_statistics(values):
     return present, float(median), float(q75 - q25)
 
 
+def emg_statistics(values, good_epochs):
+    selected = np.asarray(values[good_epochs], dtype=np.float64)
+    if selected.size == 0:
+        return np.nan, np.nan
+    return float(selected.mean()), float(selected.std())
+
+
 def critical_channels(truth_table):
     return {name for name, config in truth_table["physiological_channels"].items() if config.get("critical")}
 
 
-def patient_channel_statistics(patient_id, critical):
+def patient_channel_statistics(patient_id, critical, channel_thresholds):
     patient_dir = GOLD_DL_DIR / patient_id
+    good = quality_mask(np.load(patient_dir / "quality.npy"), channel_thresholds)
     row = {"patient_id": patient_id}
     for group_name, (_, channels) in SIGNAL_GROUPS.items():
         group = np.load(patient_dir / f"{group_name}.npy", mmap_mode="r")
@@ -293,6 +304,10 @@ def patient_channel_statistics(patient_id, critical):
                 row[f"ch_mask_{channel}"] = present
             row[f"median_{channel}"] = median
             row[f"iqr_{channel}"] = iqr
+            if channel in EMG_CHANNELS:
+                mean, std = emg_statistics(group[:, position, :], good[:, CHANNEL_INDEX[channel]])
+                row[f"mean_{channel}"] = mean
+                row[f"std_{channel}"] = std
     return row
 
 
@@ -308,8 +323,11 @@ def load_patient_metadata():
 def build_patients_table(max_workers=8):
     metadata = load_patient_metadata()
     critical = critical_channels(load_json(TRUTH_TABLE_JSON))
+    channel_thresholds = load_channel_thresholds()
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        rows = list(executor.map(patient_channel_statistics, metadata["patient_id"], repeat(critical)))
+        rows = list(executor.map(
+            patient_channel_statistics, metadata["patient_id"], repeat(critical), repeat(channel_thresholds)
+        ))
     patients = metadata.merge(pd.DataFrame(rows), on="patient_id", validate="one_to_one")
     patients.to_parquet(PATIENTS_PARQUET, index=False)
     return patients
